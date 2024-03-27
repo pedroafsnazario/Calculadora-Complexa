@@ -1,4 +1,4 @@
-# Calculadora-Complexa
+<h1 align="center">Calculadora-Complexa</h1>
 <h1 align="center">TDE de Construção de Interpretadores.
 Contexto: uma Calculadora Exótica, capaz de ler arquivos .txt
 
