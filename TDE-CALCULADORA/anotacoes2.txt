@@ -1,0 +1,134 @@
+import ast
+
+
+def resolver(file_path):
+  with open(file_path, "r") as file:
+     result = []
+     for line in file:
+       
+       line = line.replace(' ', ',').replace('(', '[').replace(')', ']').replace(';', '')
+       
+       line = ast.literal_eval(line)
+       result.append(line)
+
+  return result
+
+file_path = "teste2.txt"
+expressions = resolver(file_path)
+
+  
+
+
+def calculate(number1, number2, operator):
+  if operator == '+':
+      return number1 + number2
+  elif operator == '-':
+      return number1 - number2
+  elif operator == '*':
+      return number1 * number2
+  #elif operator == '/':
+      #return number1 / number2
+  elif operator == '|':
+      return number1 // number2
+  elif operator == '%':
+      return number1 % number2
+  elif operator == '^':
+      return number1 ** number2
+  else:
+      return "Invalid operator"
+
+
+
+
+
+
+final_results = []
+
+#expressions.append(['2', '3', '+'])
+#expressions.append(['2', '5', '-'])
+#expressions.append(['2', '3', '*']) #3 RES posicao[2]
+#expressions.append(['2', '3', '|'])
+#expressions.append(['4', 'MEM'])
+#expressions.append(['MEM', '3', '+'])
+#expressions.append(['3', 'MEM', '+']) ##
+#expressions.append(['3', 'RES', '2', '+'])
+#expressions.append(['2', '3', 'RES', '+'])
+#expressions.append(['2', [['2', '3', '+']], '*'])
+#expressions.append([[[[['2', '3', '+']], '3', '+']], '2' , '*'])
+results = []
+def avaliar(expressions, isSubexpression):
+  
+  
+  memory = 0 #para a Função MEM
+   #para a Função RES
+  result = 0
+  
+  
+  for expression in expressions:
+    
+    if type(expression[0]) == list:
+      subexpression = avaliar([expression[0]], True)
+      expression[0] = subexpression
+      if isSubexpression is False:
+       results.append(subexpression)
+      
+    if type(expression[1]) == list:
+        subexpression = avaliar([expression[1]], True)
+        expression[1] = subexpression
+        if isSubexpression is False:
+          results.append(subexpression)
+    
+    if expression[0].replace('.', '', 1).isdigit() and expression[1].replace('.', '', 1).isdigit() and len(expression) == 3:
+
+       result = calculate(float(expression[0]), float(expression[1]), expression[2])
+       if isSubexpression is False:
+        results.append(result)
+       if isSubexpression is False:
+         final_results.append(result)  
+
+
+    elif expression[1] == 'MEM' and len(expression) == 2:
+       memory = float(expression[0])
+
+    elif expression[0] == 'MEM' and len(expression) == 3:
+       result = calculate(memory, float(expression[1]), expression[2])
+       if isSubexpression is False:
+         results.append(result)
+       if isSubexpression is False:
+          final_results.append(result)
+         
+    elif expression[1] == 'MEM' and len(expression) == 3:
+       result = calculate(memory, float(expression[0]), expression[2])
+       if isSubexpression is False:
+        results.append(result)
+       if isSubexpression is False:
+          final_results.append(result)
+
+    elif len(expression) == 4 and expression[1] == 'RES':
+      
+       result = calculate(float(results[int(expression[0])-1]), float(expression[2]), expression[3])
+       if isSubexpression is False:
+        results.append(result)
+       if isSubexpression is False:
+         final_results.append(result) 
+
+    elif len(expression) == 4 and expression[2] == 'RES':
+       result = calculate(float(results[int(expression[1])-1]), float(expression[0]), expression[3])
+       if isSubexpression is False:
+         results.append(result)
+       if isSubexpression is False:
+         final_results.append(result)   
+  return str(result)   
+
+resultado_final = avaliar(expressions, False)
+
+
+line_number = 1
+for valor in final_results :
+      print(f"L{line_number}: {valor}")
+      line_number += 1
+
+  
+ 
+
+

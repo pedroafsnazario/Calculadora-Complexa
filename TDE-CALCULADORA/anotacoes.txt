@@ -1,0 +1,275 @@
+def evaluate(expression, results):
+  stack = []
+ 
+  operators = set(['+', '-', '*', '/', '^', '|', '%', 'RES', 'MEM'])
+  
+  def memoria(memory_value):
+    global memory
+    
+    memory = memory_value
+    stack.append(memory)
+    
+    
+  for token in expression.split():
+      if token.isdigit():
+          stack.append(int(token))
+      elif token in operators:
+          if token == 'RES':
+              if len(stack) < 1:
+                  raise ValueError("Expressão inválida")
+              result_index = stack.pop()
+              if result_index not in results:
+                  raise ValueError(f"Resultado não encontrado para linha {result_index}")
+              stack.append(results[result_index])
+         
+              
+            
+          elif token == 'MEM':
+            
+               
+                
+                if len(stack) >= 1:
+                  
+                  memory_value = stack.pop()
+                  
+                  memoria(memory_value)
+               
+                  
+                  
+                if len(stack) < 1:
+                  if memory is None:
+                    stack.append(0)
+                  else:
+                    stack.append(memory)
+
+                    
+               
+                
+          
+          
+              
+          elif len(stack) < 2:
+              raise ValueError("Expressão inválida")
+          else: 
+              
+              operand2 = stack.pop()
+              operand1 = stack.pop()
+              if token == '+':
+                  stack.append(operand1 + operand2)
+              elif token == '-':
+                  stack.append(operand1 - operand2)
+              elif token == '*':
+                  stack.append(operand1 * operand2)
+              elif token == '/':
+                  stack.append(operand1 // operand2)
+              elif token == '|':
+                  stack.append(operand1 / operand2)
+              elif token == '^':
+                  stack.append(operand1 ** operand2)
+              elif token == '%':
+                  stack.append(operand1 % operand2)
+
+      else:
+          raise ValueError("Token inválido: {}".format(token))
+  
+  if len(stack) != 1:
+      raise ValueError("Expressão inválida")
+  return stack[0]
+
+
+# Função para ler e resolver expressões de um arquivo
+def solve_from_file(file_path):
+  results = {}
+   
+  with open(file_path, 'r') as file:
+
+      line_number = 1
+     
+      for line in file:
+
+          expression = line.strip()
+          # Remover os parênteses
+          expression = expression.replace('(', '').replace(')', '').replace(';', '')
+          result = evaluate(expression, results)
+
+          results[line_number] = result
+
+          print(f"L{line_number}: {result}")
+
+          line_number += 1
+
+
+# Exemplo de uso
+file_path = 'teste.txt'
+solve_from_file(file_path)
+
+def calculate(number1, number2, operator):
+  if operator == '+':
+      return number1 + number2
+  elif operator == '-':
+      return number1 - number2
+  elif operator == '*':
+      return number1 * number2
+  elif operator == '/':
+      return number1 / number2
+  elif operator == '|':
+      return number1 // number2
+  elif operator == '%':
+      return number1 % number2
+  elif operator == '^':
+      return number1 ** number2
+  else:
+      return "Invalid operator"
+
+
+expressions = []
+expressions.append(['2', '3', '+'])
+expressions.append(['2', '5', '-'])
+expressions.append(['2', '3', '*']) #3 RES posicao[2]
+expressions.append(['2', '3', '/'])
+expressions.append(['4', 'MEM'])
+expressions.append(['MEM', '3', '+'])
+expressions.append(['3', 'MEM', '+'])
+expressions.append(['3', 'RES', '2', '+'])
+expressions.append(['2', '3', 'RES', '+'])
+expressions.append(['2', ['2', '3', '+'], '*'])
+
+memory = 0
+results = []
+
+for expression in expressions:
+ if expression[0].isdigit() and expression[1].isdigit() and len(expression) == 3:
+    result = calculate(float(expression[0]), float(expression[1]), expression[2])
+    results.append(result)
+    print(result)
+ if expression[1] == 'MEM':
+    memory = float(expression[0])
+ if expression[0] == 'MEM':
+    result = calculate(memory, float(expression[1]), expression[2])
+    print(result)
+    results.append(result)
+ if len(expression) == 4 and expression[1] == 'RES':
+    result = calculate(float(results[int(expression[0])-1]), float(expression[2]), expression[3])
+
+    results.append(result)
+    print(result)
+ if len(expression) == 4 and expression[2] == 'RES':
+    result = calculate(float(results[int(expression[1])-1]), float(expression[0]), expression[3])
+
+    results.append(result)
+    print(result)
+
+
+#########FORMA FINAL DO PROJETO##############
+
+def evaluate(expression, results):
+  stack = []
+
+  operators = set(['+', '-', '*', '/', '^', '|', '%', 'RES', 'MEM'])
+
+  def memoria(memory_value, trigger):
+    global memory
+
+
+    memory = 0
+
+    if trigger is True:
+     memory = memory_value
+
+
+
+
+  for token in expression.split():
+      if token.isdigit():
+          stack.append(int(token))
+      elif token in operators:
+          if token == 'RES':
+              if len(stack) < 1:
+                  raise ValueError("Expressão inválida")
+              result_index = stack.pop()
+              if result_index not in results:
+                  raise ValueError(f"Resultado não encontrado para linha {result_index}")
+              stack.append(results[result_index])
+
+
+
+          elif token == 'MEM':
+
+
+
+                if len(stack) >= 1:
+
+                  memory_value = stack.pop()
+
+                  memoria(memory_value, True)
+
+
+                if len(stack) < 1:
+                  if 'memory' not in globals():
+                    stack.append(0)
+                  else:  
+                    stack.append(memory)
+
+
+
+
+
+
+
+
+
+
+          elif len(stack) < 2:
+              raise ValueError("Expressão inválida")
+          else: 
+
+              operand2 = stack.pop()
+              operand1 = stack.pop()
+              if token == '+':
+                  stack.append(operand1 + operand2)
+              elif token == '-':
+                  stack.append(operand1 - operand2)
+              elif token == '*':
+                  stack.append(operand1 * operand2)
+              elif token == '/':
+                  stack.append(operand1 // operand2)
+              elif token == '|':
+                  stack.append(operand1 / operand2)
+              elif token == '^':
+                  stack.append(operand1 ** operand2)
+              elif token == '%':
+                  stack.append(operand1 % operand2)
+
+      else:
+          raise ValueError("Token inválido: {}".format(token))
+
+  if len(stack) != 1:
+      raise ValueError("Expressão inválida")
+  return stack[0]
+
+
+# Função para ler e resolver expressões de um arquivo
+def solve_from_file(file_path):
+  results = {}
+
+  with open(file_path, 'r') as file:
+
+      line_number = 1
+
+      for line in file:
+
+          expression = line.strip()
+          # Remover os parênteses
+          expression = expression.replace('(', '').replace(')', '').replace(';', '')
+          result = evaluate(expression, results)
+
+          results[line_number] = result
+
+          print(f"L{line_number}: {result}")
+
+          line_number += 1
+
+
+# Exemplo de uso
+file_path = 'teste.txt'
+solve_from_file(file_path)
